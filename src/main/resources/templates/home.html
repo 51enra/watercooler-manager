@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" type="text/css" media="all" href="../static/css/index.css" th:href="@{/css/index.css}">
+    <title>Watercooler</title>
+    <script type="text/javascript" th:src="@{/js/refresh.js}"></script>
+</head>
+<body>
+<div class="header">
+    <img th:src="@{/img/Telekom_Logo_2013.svg.png}" height="40px">
+    <h1>
+        Watercooler
+    </h1>
+</div>
+<div class="container">
+    <div class="indicators-top">
+        <div class="header2">
+            <h3> FILL LEVEL </h3>
+        </div>
+        <div class="indicators">
+            <div></div>
+            <div class="level-frame">
+                <div class="level-meter">
+                    <div id="level-height" th:text="${fillLevel}" th:style="'height: ' + ${fillLevel} + ';'">20%</div>
+                </div>
+            </div>
+            <div class="alarm-indicator">
+                <div class="box2">
+                    <div id="overflow" class="round-light"></div>
+                    <p>OVERFLOW</p>
+                </div>
+                <div style="flex-grow: 1;"></div>
+                <div class="box2">
+                    <div id="error" class="round-light"></div>
+                    <p>ERROR</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="operation">
+        <div class="userarea">
+            <div class="header2">
+                <h3> CUSTOMER - TAP WATER</h3>
+            </div>
+            <form class="customer-grid" th:action="@{/customer}" action="#" method="post" th:object="${userDTO}">
+                <div></div>
+                <div class="box">
+                    <div id="SMALL" class="round-light"></div>
+                </div>
+                <div class="box">
+                    <div id="MEDIUM" class="round-light"></div>
+                </div>
+                <div class="box">
+                    <div id="LARGE" class="round-light"></div>
+                </div>
+                <div></div>
+                <button class="btn-blue" name="customerAction" value="SMALL">
+                  <img class="image" th:src="@{/img/coffee-cup.png}" width="40"
+                                                           height="40">
+                </button>
+                <button class="btn-blue" name="customerAction" value="MEDIUM">
+                    <img class="image" th:src="@{/img/cup.png}" width="40"
+                         height="40">
+                </button>
+                <button class="btn-blue" name="customerAction" value="LARGE">
+                    <img class="image" th:src="@{/img/jug.png}" width="40"
+                                                           height="40">
+                </button>
+            </form>
+        </div>
+        <div class="userarea">
+            <div class="header2">
+                <h3> OPERATOR </h3>
+            </div>
+            <form class="control-grid" th:action="@{/operator}" action="#" method="post" th:object="${userDTO}">
+                <div></div>
+                <div></div>
+                <h4>Device</h4>
+                <div></div>
+                <h4>Auto-Refill</h4>
+                <h4>Manual Fillrate</h4>
+
+                <div></div>
+                <div id="mount" class="round-light"></div>
+                <button class="btn-green" name="operatorAction" value="mount">Mount</button>
+                <div id="start" class="round-light"></div>
+                <button class="btn-green" name="operatorAction" value="start">Start</button>
+                <div>
+                    <input name="fillRate" type="number" maxlength="2" min="0" max="10" size="3">
+                </div>
+
+                <div></div>
+                <div id="unmount" class="round-light"></div>
+                <button class="btn-green" name="operatorAction" value="unmount">Unmount</button>
+                <div id="stop" class="round-light"></div>
+                <button class="btn-green" name="operatorAction" value="stop">Stop</button>
+                <button class="btn-green" type="submit">Set</button>
+            </form>
+        </div>
+    </div>
+</div>
+</body>
+</html>
