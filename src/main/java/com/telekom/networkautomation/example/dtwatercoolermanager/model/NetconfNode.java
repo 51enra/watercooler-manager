@@ -19,7 +19,7 @@ public class NetconfNode {
     String password;
 
     @JsonProperty("netconf-node-topology:host")
-    String host;
+    String ipAddress;
 
     @JsonProperty("netconf-node-topology:port")
     Integer port;
@@ -61,10 +61,6 @@ public class NetconfNode {
         return connectionStatus;
     }
 
-    public void setConnectionStatus(String connectionStatus) {
-        this.connectionStatus = connectionStatus;
-    }
-
     public boolean isTcpOnly() {
         return tcpOnly;
     }
@@ -73,12 +69,12 @@ public class NetconfNode {
         this.tcpOnly = tcpOnly;
     }
 
-    public String getHost() {
-        return host;
+    public String getIpAddress() {
+        return ipAddress;
     }
 
-    public void setHost(String host) {
-        this.host = host;
+    public void setIpAddress(String ipAddress) {
+        this.ipAddress = ipAddress;
     }
 
     public Integer getPort() {
@@ -93,7 +89,4 @@ public class NetconfNode {
         return availableCapabilities;
     }
 
-    public void setAvailableCapabilities(Map<String, List<NetconfCapability>> availableCapabilities) {
-        this.availableCapabilities = availableCapabilities;
-    }
 }

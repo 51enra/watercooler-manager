@@ -1,0 +1,22 @@
+version: '2.4'
+
+services:
+
+  odlsli:
+    image: onap/sdnc-image:2.2.5
+    container_name: onap_sdnc
+    ports:
+      - "8181:8181"
+      - "8101:8101"
+    environment:
+      - SDNC_CONFIG_DIR=/opt/onap/ccsdk/data/properties
+      - ENABLE_ODL_CLUSTER=false
+      - SDNC_REPLICAS=0
+      - CCSDK_REPLICAS=0
+      - DOMAIN=""
+      - ODL_ADMIN_PASSWORD=admin
+    logging:
+      driver:   "json-file"
+      options:
+        max-size: "30m"
+        max-file: "5"

@@ -21,28 +21,28 @@ public class WebClientConfig {
 
     private final static Logger LOG = LoggerFactory.getLogger(WebClientConfig.class);
 
-    @Value("${sdncconfig.sdnc.baseurl}")
+    @Value("${sdnc.baseurl}")
     String sdncUrl;
 
-    @Value("${sdncconfig.sdnc.restport}")
+    @Value("${sdnc.restport}")
     String restPort;
 
-    @Value("${sdncconfig.sdnc.username}")
+    @Value("${sdnc.username}")
     String sdncUsername;
 
-    @Value("${sdncconfig.sdnc.password}")
+    @Value("${sdnc.password}")
     String sdncPassword;
 
-    @Value("${sdncconfig.netconf.device.ipaddress}")
+    @Value("${netconf.ipaddress}")
     String netconfIpAddress;
 
-    @Value("${sdncconfig.netconf.device.netconfport}")
+    @Value("${netconf.port}")
     Integer netconfPort;
 
-    @Value("${sdncconfig.netconf.device.username}")
+    @Value("${netconf.username}")
     String netconfUsername;
 
-    @Value("${sdncconfig.netconf.device.password}")
+    @Value("${netconf.password}")
     String netconfPassword;
 
     private final boolean tcpOnly = false;
@@ -50,7 +50,7 @@ public class WebClientConfig {
     @Bean
     NetconfNode netconfNode() {
         NetconfNode netconfNode = new NetconfNode();
-        netconfNode.setHost(this.netconfIpAddress);
+        netconfNode.setIpAddress(this.netconfIpAddress);
         netconfNode.setPort(this.netconfPort);
         netconfNode.setUsername(this.netconfUsername);
         netconfNode.setPassword(this.netconfPassword);

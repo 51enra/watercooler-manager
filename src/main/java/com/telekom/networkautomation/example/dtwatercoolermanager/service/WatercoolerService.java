@@ -9,17 +9,19 @@ import org.springframework.web.reactive.function.client.WebClientException;
 import java.util.HashMap;
 import java.util.Map;
 
+//TODO: This class should be broken down, e.g. by taking out the two inner classes Mounter and ControlLoop!
+
 @Service
 public class WatercoolerService {
 
     private final static Logger LOG = LoggerFactory.getLogger(WatercoolerService.class);
 
-    private final int controlLoopPeriodMs = 1000; // Delay between control loop executions in ms
-    private final int mountLoopPeriodMs = 1000; // Delay between checks if mount is completed in ms
-    private final String nodeId = "watercooler";
-    private final String topologyName = "topology-netconf";
-    private final String yangFilter = "watercooler:watercooler";
-    private final String tapYangFilter = "watercooler:tap";
+    private final static int CONTROL_LOOP_PERIOD_MS = 1000; // Delay between control loop executions in ms
+    private final static int MOUNT_LOOP_PERIOD_MS = 1000; // Delay between checks if mount is completed in ms
+    private final static String NODE_ID = "watercooler";
+    private final static String TOPOLOGY_NAME = "topology-netconf";
+    private final static String YANG_FILTER = "watercooler:watercooler";
+    private final static String TAP_YANG_FILTER = "watercooler:tap";
 
     private SdncApiService sdncApiService;
     private NetconfNode watercoolerNode;
@@ -40,9 +42,10 @@ public class WatercoolerService {
     private WatercoolerService(SdncApiService sdncApiService, NetconfNode watercoolerNode) {
         this.sdncApiService = sdncApiService;
         this.watercoolerNode = watercoolerNode;
-        this.watercoolerNode.setNodeId(this.nodeId);
+        this.watercoolerNode.setNodeId(this.NODE_ID);
         this.tapSuccessful = new HashMap<>();
         initStatus();
+        LOG.info("Watercooler device IP address: {}", this.watercoolerNode.getIpAddress());
     }
 
     private void initStatus() {
@@ -70,7 +73,7 @@ public class WatercoolerService {
             super.run();
             try {
                 // TODO: Better way to evaluate response status if we don't need the response otherwise?
-                sdncApiService.mountNetconfNode(topologyName, nodeId, watercoolerNode)
+                sdncApiService.mountNetconfNode(TOPOLOGY_NAME, NODE_ID, watercoolerNode)
                         .bodyToMono(String.class)
                         .block();
                 // Wait until mounting is completed
@@ -78,8 +81,8 @@ public class WatercoolerService {
                         watercoolerTopology.getNode().size() == 0 ||
                         watercoolerTopology.getNode().get(0).getConnectionStatus() == null ||
                         !watercoolerTopology.getNode().get(0).getConnectionStatus().equals("connected")) {
-                    Thread.sleep(mountLoopPeriodMs);
-                    watercoolerTopology = sdncApiService.getTopologyForNode(topologyName, nodeId)
+                    Thread.sleep(MOUNT_LOOP_PERIOD_MS);
+                    watercoolerTopology = sdncApiService.getTopologyForNode(TOPOLOGY_NAME, NODE_ID)
                             .bodyToMono(SdncNetconfTopology.class)
                             .block();
                 }
@@ -119,7 +122,7 @@ public class WatercoolerService {
                     }
                 }
                 try {
-                    Thread.sleep(controlLoopPeriodMs);
+                    Thread.sleep(CONTROL_LOOP_PERIOD_MS);
                 } catch (InterruptedException e) {
                     LOG.debug("Control loop interrupt received.");
                     controlLoopStarted = false;
@@ -144,7 +147,7 @@ public class WatercoolerService {
             this.autoRefillStarted = false;
             controlLoop.interrupt();
             try {
-                response = sdncApiService.unmountNetconfNode(this.topologyName, this.nodeId)
+                response = sdncApiService.unmountNetconfNode(TOPOLOGY_NAME, NODE_ID)
                         .bodyToMono(String.class)
                         .block();
                 LOG.info("Watercooler unmounted successfully.");
@@ -231,7 +234,7 @@ public class WatercoolerService {
             Watercooler fillRequestBody = new Watercooler();
             fillRequestBody.setWatercoolerData(watercoolerData);
             try {
-                String response = sdncApiService.editNodeConfig(this.topologyName, this.nodeId, this.yangFilter,
+                String response = sdncApiService.editNodeConfig(TOPOLOGY_NAME, NODE_ID, YANG_FILTER,
                         fillRequestBody, Watercooler.class)
                         .bodyToMono(String.class)
                         .block();
@@ -251,7 +254,7 @@ public class WatercoolerService {
                 TapRpcRequestBody body = new TapRpcRequestBody();
                 body.setTapSize(tapSize);
                 TapRpcResponseBody response =
-                        sdncApiService.sendRpc(this.topologyName, this.nodeId, this.tapYangFilter, body, TapRpcRequestBody.class)
+                        sdncApiService.sendRpc(TOPOLOGY_NAME, NODE_ID, TAP_YANG_FILTER, body, TapRpcRequestBody.class)
                                 .bodyToMono(TapRpcResponseBody.class)
                                 .block();
                 this.tapSuccessful.put(tapSize, response.getTapResult().getTapSuccessful());
@@ -270,7 +273,7 @@ public class WatercoolerService {
 
     private void updateWatercoolerData() {
         try {
-            this.watercooler = sdncApiService.getNodeData(this.topologyName, this.nodeId, this.yangFilter)
+            this.watercooler = sdncApiService.getNodeData(TOPOLOGY_NAME, NODE_ID, YANG_FILTER)
                     .bodyToMono(Watercooler.class)
                     .block();
         } catch (WebClientException e) {
