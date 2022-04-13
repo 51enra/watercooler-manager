@@ -10,9 +10,9 @@ The task of the operator is to always ensure that the customer has access to fre
 The customer can tap different quantities of water from the tank. More details about the background for
 this setup can be found in *xxxx*.
 
-[1]: [ONAP](https://www.onap.org/), Open Network Automation Platform; an Open Source project of the Linux Foundation
+[1] [ONAP](https://www.onap.org/), Open Network Automation Platform; an Open Source project of the Linux Foundation
 
-[2]: SDN, Software Defined Networking. There are many explanatory sources, e.g. [Wikipedia](https://en.wikipedia.org/wiki/Software-defined_networking).
+[2] SDN, Software Defined Networking. There are many explanatory sources, e.g. [Wikipedia](https://en.wikipedia.org/wiki/Software-defined_networking).
 
 ## The Watercooler Device
 
@@ -103,20 +103,21 @@ If you want to stop the SDNC, enter ``docker-compose down`` in your terminal.
 You can retrieve information from the SDNC by sending requests via the OpenApi documentation page.
 You can also trigger the SDNC to communicate with the Netconf device by using requests on the OpenApi documentation page.
 Later on, the watercooler manager will handle the communication with the SDNC. If you are currently not interested in
-these details, you can skip this part. In that case, please continue reading in the section below on the watercooler manager.
+the details of the SDNC interfaces, you can skip this part. In that case, please continue reading in the section below
+on the watercooler manager.
 
 **Prerequisites:** The watercooler device has been started. The SDNC container is running, and you have opened the
 OpenApi documentation page in your browser.
 
 1. Find the section "network-topology" on the web page and expand it by clicking the arrow at the right-hand side.
 2. Find the blue entry that says "GET - network-topology - topology" in small print at the end of the line. Here,
-    you can make that browser send a REST GET request to a specific endpoint of the SDNC API that provides information
-   on the network topology information available to the SDNC. Multiple separate topologies can be managed by the
-   SDNC that are distinguished by a topology id.
+    you can send a REST GET request to a specific endpoint of the SDNC API that shows the network topology
+   information currently available to the SDNC. Multiple separate topologies can be managed by the
+   SDNC. They are distinguished by topology IDs.
 3. Expand the request by clicking anywhere in the blue area. For Netconf devices, there is a pre-defined topology
    with the id "topology-netconf". We will retrieve information about this topology now. Click on "Try it out",
    then enter "topology-netconf" in the entry field for the topology id and click on execute. As no netconf device
-   is known yet to the SDNC, the topology is empty. You can see this further below in the field "Response body":
+   is known to the SDNC yet, the topology is empty. You can see this further below in the field "Response body":
 ```
 <topology xmlns="urn:TBD:params:xml:ns:yang:network-topology">
   <topology-id>topology-netconf</topology-id>
@@ -143,15 +144,15 @@ OpenApi documentation page in your browser.
     }
  ```
 5.  When you scroll down to the responses area, you should see a response code 201, which confirms that
-    the device was successfully added to the topology. In the terminal window showing the log of the watercooler
+    the device has been successfully added to the topology. In the terminal window showing the log of the watercooler
     device, you should see a line saying `Session admin@/X.X.X.X:Y authenticated`. For ``X.X.X.X``, it should show
     the IPv4 address as above and for `Y` a random port number. If this didn't work, the SDNC and the watercooler
     device cannot communicate for some reason.
 6.  Go back to the browser window, scroll up to the GET request "GET - network-topology - topology" and repeat step 2.
     Select "application/json" in the dropdown field in the Responses section of the blue area (only
     for easier comparison with the response reproduced below; the xml response format is 
-    equivalent). Now, the response should be (with several more capabilities listed instead
-    of the ellipsis ``....``):
+    equivalent). Now, the response should be (with several more capabilities listed in the place
+    of ``....``):
     ```
     {
       "network-topology:topology": [
@@ -191,19 +192,20 @@ OpenApi documentation page in your browser.
     
 7. At the top of the web page, you find a black bar. At the right, there is a dropdown menu labeled
    "Select controller/mounted resources of specific RestConf version". This allows to switch between
-   the REST APIs of the SDNC itself (where we are now), and the different mounted devices. When you expand
+   the REST APIs of the SDN controller itself (where we are now), and the REST APIS for the different mounted
+   devices. When you expand
    the dropdown menu, you will see four entries, two for the SDNC API and two for the watercooler
    device API. The two versions per API represent slightly different flavors; the difference is not
    of interest here. Select the entry "topology-netconfnode resources -
    RestConf RFC 8040". If you receive an error message, refresh the page.
 
-8. Via the API you should be able to see now, full control of the watercooler device is possible.
+8. Via the API that is displayed now, control of the watercooler device is possible.
    The SDNC will translate every REST request received on this API into the corresponding Netconf
-   request and send it to the watercooler device.
+   request and will send it to the watercooler device.
    It will process the response, and provide a response to the REST request depending on the Netconf
    response received. The watercooler manager described below sends requests to this API. As
    a simple example, we will retrieve the configuration and operational data from the watercooler device.
-   Expand the menu "watercooler" by clicking on the arrow at the right. Expand the blue area labeled
+   Expand the menu entry "watercooler" by clicking on the arrow at the right. Expand the blue area labeled
    "GET - watercooler - watercooler - watercooler" [3] in small print. As before, expand the blue
    area, click on "Try it out", select "application/json" and "execute". the response should look as
    follows:
@@ -218,8 +220,13 @@ OpenApi documentation page in your browser.
     }
    }
    ```
-   
-[3]: The three repetition of "watercooler" are caused by our naming. The first is the node id that we
+   This is the translation to JSON of the Netconf response received from the watercooler device. When you send
+   this request while the watercooler device is being controlled by the watercooler manager, you may see a
+   different refill rate, fill level or overflow indicator status. The elements "watercoolerManufacturer" and
+   "watercoolerModelNumber" are "vendor information" set by the watercooler device itself and cannot be modified
+   by the client.
+
+[3] The three repetition of "watercooler" are caused by our naming. The first is the node id that we
 defined when mounting the device. The second is the name of the Netconf capability we are
 addressing, see above at step 6. It corresponds to a specific YANG model. The third is the name of a
 "data container" which is defined inside the YANG model and which contains the data we are looking for.
